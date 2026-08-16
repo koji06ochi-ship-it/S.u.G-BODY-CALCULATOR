@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>S.u.G BODY CALCULATOR</title>
+<style>
+:root{--bg:#0d0d0f;--card:#17171b;--line:#303038;--text:#f7f7f7;--muted:#b8b8c2;--accent:#f2c230}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.wrap{max-width:720px;margin:auto;padding:24px 16px 48px}.brand{font-weight:900;letter-spacing:.08em;color:var(--accent);font-size:14px}
+h1{font-size:28px;margin:8px 0 4px}.sub{color:var(--muted);line-height:1.65;margin-bottom:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:520px){.grid{grid-template-columns:1fr}}
+label{display:block;font-size:13px;color:var(--muted);margin:4px 0 7px}
+input,select{width:100%;padding:13px 12px;border-radius:12px;border:1px solid var(--line);background:#101014;color:#fff;font-size:16px}
+button{width:100%;border:0;border-radius:14px;padding:16px;font-size:17px;font-weight:900;background:var(--accent);color:#111;margin-top:8px}
+.result{display:none}.hero{text-align:center;padding:8px 0 16px}.kcal{font-size:42px;font-weight:900;color:var(--accent)}
+.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.metric{background:#101014;border-radius:14px;padding:14px}
+.metric b{display:block;font-size:22px;margin-top:5px}.pfc{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pfc div{text-align:center;background:#101014;border-radius:14px;padding:14px 6px}.pfc b{font-size:23px;display:block}
+.note{font-size:13px;color:var(--muted);line-height:1.65}.warn{border-left:4px solid var(--accent);padding-left:12px}.tag{display:inline-block;padding:5px 9px;border-radius:999px;background:#29230e;color:#ffe16a;font-size:12px;font-weight:700}
+</style>
+</head>
+<body><div class="wrap">
+<div class="brand">S.u.G OSAKA</div>
+<h1>BODY CALCULATOR</h1>
+<div class="sub">基礎代謝・推定消費カロリー・目的別摂取カロリー・PFCの<strong>開始目安</strong>を計算します。</div>
+
+<div class="card">
+<div class="grid">
+<div><label>性別</label><select id="sex"><option value="m">男性</option><option value="f">女性</option></select></div>
+<div><label>年齢</label><input id="age" type="number" inputmode="numeric" placeholder="例：30"></div>
+<div><label>身長（cm）</label><input id="height" type="number" inputmode="decimal" placeholder="例：170"></div>
+<div><label>体重（kg）</label><input id="weight" type="number" inputmode="decimal" placeholder="例：65.5"></div>
+<div><label>体脂肪率（%・任意）</label><input id="bf" type="number" inputmode="decimal" placeholder="例：15"></div>
+<div><label>日常の活動量</label><select id="activity">
+<option value="1.2">低い：座位中心・歩行少なめ</option>
+<option value="1.375">やや低い：軽い運動 週1〜3回</option>
+<option value="1.55" selected>中程度：運動 週3〜5回</option>
+<option value="1.725">高い：運動 週6〜7回</option>
+<option value="1.9">非常に高い：肉体労働＋高頻度運動</option>
+</select></div>
+<div><label>筋トレ頻度</label><select id="training">
+<option value="0">ほぼなし</option><option value="1">週1〜2回</option><option value="2" selected>週3〜4回</option><option value="3">週5回以上</option>
+</select></div>
+<div><label>目的</label><select id="goal" onchange="togglePace()">
+<option value="cut">減量</option><option value="recomp" selected>リコンプ</option><option value="maintain">維持</option><option value="gain">増量</option>
+</select></div>
+<div id="paceBox"><label>ペース</label><select id="pace">
+<option value="slow">ゆっくり</option><option value="standard" selected>標準</option><option value="fast">速め</option>
+</select></div>
+</div>
+<button onclick="calculate()">計算する</button>
+</div>
+
+<div id="result" class="result">
+<div class="card hero"><span class="tag" id="goalLabel">リコンプ</span><div class="note" style="margin-top:12px">1日の目標摂取カロリー</div><div class="kcal"><span id="target">0</span> kcal</div></div>
+<div class="card"><div class="metrics">
+<div class="metric"><span class="note">基礎代謝 BMR</span><b><span id="bmr">0</span> kcal</b></div>
+<div class="metric"><span class="note">推定消費 TDEE</span><b><span id="tdee">0</span> kcal</b></div>
+</div></div>
+<div class="card"><h2>PFC目安</h2><div class="pfc">
+<div>Protein<b><span id="p">0</span>g</b></div><div>Fat<b><span id="f">0</span>g</b></div><div>Carbs<b><span id="c">0</span>g</b></div>
+</div></div>
+<div class="card"><h2>判定</h2><p id="explain" class="note"></p></div>
+<div class="card warn note">
+この数値は推定値であり、診断値ではありません。まず開始目安として使用し、2〜3週間の平均体重・ウエスト・トレーニングパフォーマンス・体調などを確認して調整してください。極端な食事制限、体調不良、医療上の問題がある場合は自己判断で減量・増量を進めず、医療専門職へご相談ください。
+</div>
+</div>
+</div>
+<script>
+function togglePace(){
+ const g=document.getElementById('goal').value;
+ document.getElementById('paceBox').style.display=(g==='maintain'||g==='recomp')?'none':'block';
+}
+function calculate(){
+ const sex=document.getElementById('sex').value, age=+document.getElementById('age').value;
+ const h=+document.getElementById('height').value, w=+document.getElementById('weight').value, bf=+document.getElementById('bf').value;
+ if(!age||!h||!w||age<14||h<120||w<30){alert('年齢・身長・体重を確認してください。');return}
+ let bmr = 10*w + 6.25*h - 5*age + (sex==='m'?5:-161); // Mifflin-St Jeor
+ let katch = null;
+ if(bf>=5 && bf<=60) katch=370+21.6*(w*(1-bf/100));
+ const act=+document.getElementById('activity').value;
+ let tdee=bmr*act;
+ const goal=document.getElementById('goal').value, pace=document.getElementById('pace').value;
+ let factor=1,label='',desc='';
+ if(goal==='cut'){
+   factor={slow:.90,standard:.85,fast:.80}[pace]; label='減量';
+   desc='筋量・パフォーマンスをできるだけ維持しながら脂肪減少を狙う開始設定です。速めの設定ほど回復状態の確認を重視してください。';
+ }else if(goal==='recomp'){
+   factor=.95; label='リコンプ';
+   desc='維持カロリー付近〜小幅な赤字から始め、筋力・見た目・ウエスト・平均体重を同時に追う設定です。';
+ }else if(goal==='gain'){
+   factor={slow:1.05,standard:1.08,fast:1.12}[pace]; label='増量';
+   desc='必要以上の脂肪増加を抑えながら、トレーニングの伸びと筋量増加を狙う開始設定です。';
+ }else{
+   factor=1; label='維持';
+   desc='現在の体重を大きく動かさず、パフォーマンスとコンディションを整える開始設定です。';
+ }
+ let target=Math.round((tdee*factor)/10)*10;
+ const tr=+document.getElementById('training').value;
+ let proteinPerKg = (goal==='cut'||goal==='recomp') ? (tr>=2?2.0:1.8) : (tr>=2?1.8:1.6);
+ let protein=Math.round(w*proteinPerKg);
+ let fatPerKg = goal==='cut' ? .8 : .9;
+ let fat=Math.round(w*fatPerKg);
+ let carbs=Math.max(0,Math.round((target-protein*4-fat*9)/4));
+ document.getElementById('bmr').textContent=Math.round(bmr);
+ document.getElementById('tdee').textContent=Math.round(tdee/10)*10;
+ document.getElementById('target').textContent=target;
+ document.getElementById('p').textContent=protein; document.getElementById('f').textContent=fat; document.getElementById('c').textContent=carbs;
+ document.getElementById('goalLabel').textContent=label;
+ let extra=katch?` 体脂肪率から推定した除脂肪体重ベースBMRは約${Math.round(katch)} kcalです。`:'';
+ document.getElementById('explain').textContent=desc+extra+' 実測の体重推移に合わせて摂取量を調整してください。';
+ document.getElementById('result').style.display='block';
+ document.getElementById('result').scrollIntoView({behavior:'smooth'});
+}
+togglePace();
+</script></body></html>
