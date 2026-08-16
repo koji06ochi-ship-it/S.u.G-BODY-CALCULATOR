@@ -83,7 +83,7 @@ function calculate(){
  document.getElementById('bmrCompare').textContent=katch?`Mifflin-St Jeor式：約${Math.round(mifflin)} kcal ／ 除脂肪体重ベース：約${Math.round(katch)} kcal。体脂肪率入力時は両者の中間値を開始目安に使用しています。`:'体脂肪率未入力のため、Mifflin-St Jeor式を使用しています。';
  document.getElementById('plan').innerHTML=`<div class="planitem"><strong>① まず2週間固定</strong><span class="note">毎日の数値ではなく、週平均で判定。</span></div><div class="planitem"><strong>② 見る指標</strong><span class="note">${check}</span></div><div class="planitem"><strong>③ 2週間後の調整</strong><span class="note">${adjust}</span></div><div class="planitem"><strong>④ 判断基準</strong><span class="note good">${decision}</span></div>`;
  document.getElementById('explain').textContent=desc+' 数値は固定解ではなく、実測データから微調整するためのスタート地点です。';
- window.sugResult={label,target,bmr:Math.round(bmrBase),tdee:rnd10(tdee),p:protein,f:fat,c:carbs,paceText,check,adjust,decision};
+ window.sugResult={label,target,bmr:Math.round(bmrBase),tdee:rnd10(tdee),p:protein,f:fat,c:carbs,paceText,check,adjust,decision,weight:w};
  document.getElementById('result').style.display='block';document.getElementById('result').scrollIntoView({behavior:'smooth'});
 }
 
@@ -91,7 +91,9 @@ window.sugResult = null;
 function copyResult(){
  const r=window.sugResult;
  if(!r){alert('先に計算してください。');return}
- const text=`【S.u.G BODY CALCULATOR】\n目的：${r.label}\n目標摂取：${r.target} kcal/日\nBMR：${r.bmr} kcal\nTDEE：${r.tdee} kcal\nPFC：P ${r.p}g / F ${r.f}g / C ${r.c}g\n目安ペース：${r.paceText}\n\n【2週間の進め方】\n見る指標：${r.check}\n調整：${r.adjust}\n判断基準：${r.decision}\n\n※推定値のため、週平均の体重・ウエスト・トレーニングパフォーマンス・体調を見て調整。`;
+ const now=new Date();
+ const calcDate=`${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`;
+ const text=`【S.u.G BODY CALCULATOR】\n計算日：${calcDate}\n現在体重：${r.weight} kg\n目的：${r.label}\n目標摂取：${r.target} kcal/日\nBMR：${r.bmr} kcal\nTDEE：${r.tdee} kcal\nPFC：P ${r.p}g / F ${r.f}g / C ${r.c}g\n目安ペース：${r.paceText}\n\n【2週間の進め方】\n見る指標：${r.check}\n調整：${r.adjust}\n判断基準：${r.decision}\n\n※推定値のため、週平均の体重・ウエスト・トレーニングパフォーマンス・体調を見て調整。`;
  if(navigator.clipboard && window.isSecureContext){
    navigator.clipboard.writeText(text).then(()=>alert('計算結果をコピーしました。')).catch(()=>fallbackCopy(text));
  }else{fallbackCopy(text)}
