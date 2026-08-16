@@ -6,7 +6,7 @@
 <title>S.u.G BODY CALCULATOR</title>
 <style>
 :root{--bg:#0d0d0f;--card:#17171b;--line:#303038;--text:#f7f7f7;--muted:#b8b8c2;--accent:#f2c230;--ok:#8ee39b}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.wrap{max-width:760px;margin:auto;padding:24px 16px 56px}.brand{font-weight:900;letter-spacing:.08em;color:var(--accent);font-size:14px}h1{font-size:28px;margin:8px 0 4px}.sub{color:var(--muted);line-height:1.65;margin-bottom:20px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:520px){.grid{grid-template-columns:1fr}}label{display:block;font-size:13px;color:var(--muted);margin:4px 0 7px}input,select{width:100%;padding:13px 12px;border-radius:12px;border:1px solid var(--line);background:#101014;color:#fff;font-size:16px}button,.cta{width:100%;border:0;border-radius:14px;padding:16px;font-size:17px;font-weight:900;background:var(--accent);color:#111;margin-top:8px;text-align:center;text-decoration:none;display:block}.result{display:none}.hero{text-align:center;padding:8px 0 16px}.kcal{font-size:42px;font-weight:900;color:var(--accent)}.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.metric{background:#101014;border-radius:14px;padding:14px}.metric b{display:block;font-size:22px;margin-top:5px}.pfc{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pfc div{text-align:center;background:#101014;border-radius:14px;padding:14px 6px}.pfc b{font-size:23px;display:block}.note{font-size:13px;color:var(--muted);line-height:1.7}.warn{border-left:4px solid var(--accent);padding-left:12px}.tag{display:inline-block;padding:5px 9px;border-radius:999px;background:#29230e;color:#ffe16a;font-size:12px;font-weight:700}.plan{display:grid;gap:10px}.planitem{background:#101014;border-radius:14px;padding:14px}.planitem strong{display:block;margin-bottom:4px}.good{color:var(--ok)}.small{font-size:12px;color:var(--muted)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.wrap{max-width:760px;margin:auto;padding:24px 16px 56px}.brand{font-weight:900;letter-spacing:.08em;color:var(--accent);font-size:14px}h1{font-size:28px;margin:8px 0 4px}.sub{color:var(--muted);line-height:1.65;margin-bottom:20px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:520px){.grid{grid-template-columns:1fr}}label{display:block;font-size:13px;color:var(--muted);margin:4px 0 7px}input,select{width:100%;padding:13px 12px;border-radius:12px;border:1px solid var(--line);background:#101014;color:#fff;font-size:16px}button,.cta{width:100%;border:0;border-radius:14px;padding:16px;font-size:17px;font-weight:900;background:var(--accent);color:#111;margin-top:8px;text-align:center;text-decoration:none;display:block}.copybtn{background:#26262d;color:#fff;border:1px solid var(--line)}.result{display:none}.hero{text-align:center;padding:8px 0 16px}.kcal{font-size:42px;font-weight:900;color:var(--accent)}.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.metric{background:#101014;border-radius:14px;padding:14px}.metric b{display:block;font-size:22px;margin-top:5px}.pfc{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pfc div{text-align:center;background:#101014;border-radius:14px;padding:14px 6px}.pfc b{font-size:23px;display:block}.note{font-size:13px;color:var(--muted);line-height:1.7}.warn{border-left:4px solid var(--accent);padding-left:12px}.tag{display:inline-block;padding:5px 9px;border-radius:999px;background:#29230e;color:#ffe16a;font-size:12px;font-weight:700}.plan{display:grid;gap:10px}.planitem{background:#101014;border-radius:14px;padding:14px}.planitem strong{display:block;margin-bottom:4px}.good{color:var(--ok)}.small{font-size:12px;color:var(--muted)}
 </style>
 </head>
 <body><div class="wrap">
@@ -33,6 +33,7 @@
 <div class="card"><h2>進め方</h2><div class="plan" id="plan"></div></div>
 <div class="card"><h2>判定</h2><p id="explain" class="note"></p></div>
 <div class="card warn note">この数値は推定値であり、診断値ではありません。まず開始目安として使用し、<strong>2週間の平均体重・ウエスト・トレーニングパフォーマンス・体調</strong>を確認して調整してください。極端な食事制限、体調不良、医療上の問題がある場合は自己判断で減量・増量を進めず、医療専門職へご相談ください。</div>
+<button class="copybtn" onclick="copyResult()">結果をコピー</button>
 <a class="cta" href="https://line.me/R/ti/p/%40sugosaka">S.u.G大阪で相談する</a>
 </div>
 </div>
@@ -82,7 +83,24 @@ function calculate(){
  document.getElementById('bmrCompare').textContent=katch?`Mifflin-St Jeor式：約${Math.round(mifflin)} kcal ／ 除脂肪体重ベース：約${Math.round(katch)} kcal。体脂肪率入力時は両者の中間値を開始目安に使用しています。`:'体脂肪率未入力のため、Mifflin-St Jeor式を使用しています。';
  document.getElementById('plan').innerHTML=`<div class="planitem"><strong>① まず2週間固定</strong><span class="note">毎日の数値ではなく、週平均で判定。</span></div><div class="planitem"><strong>② 見る指標</strong><span class="note">${check}</span></div><div class="planitem"><strong>③ 2週間後の調整</strong><span class="note">${adjust}</span></div><div class="planitem"><strong>④ 判断基準</strong><span class="note good">${decision}</span></div>`;
  document.getElementById('explain').textContent=desc+' 数値は固定解ではなく、実測データから微調整するためのスタート地点です。';
+ window.sugResult={label,target,bmr:Math.round(bmrBase),tdee:rnd10(tdee),p:protein,f:fat,c:carbs,paceText,check,adjust,decision};
  document.getElementById('result').style.display='block';document.getElementById('result').scrollIntoView({behavior:'smooth'});
 }
+
+window.sugResult = null;
+function copyResult(){
+ const r=window.sugResult;
+ if(!r){alert('先に計算してください。');return}
+ const text=`【S.u.G BODY CALCULATOR】\n目的：${r.label}\n目標摂取：${r.target} kcal/日\nBMR：${r.bmr} kcal\nTDEE：${r.tdee} kcal\nPFC：P ${r.p}g / F ${r.f}g / C ${r.c}g\n目安ペース：${r.paceText}\n\n【2週間の進め方】\n見る指標：${r.check}\n調整：${r.adjust}\n判断基準：${r.decision}\n\n※推定値のため、週平均の体重・ウエスト・トレーニングパフォーマンス・体調を見て調整。`;
+ if(navigator.clipboard && window.isSecureContext){
+   navigator.clipboard.writeText(text).then(()=>alert('計算結果をコピーしました。')).catch(()=>fallbackCopy(text));
+ }else{fallbackCopy(text)}
+}
+function fallbackCopy(text){
+ const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();
+ try{document.execCommand('copy');alert('計算結果をコピーしました。')}catch(e){prompt('この結果をコピーしてください。',text)}
+ document.body.removeChild(ta);
+}
+
 togglePace();
 </script></body></html>
