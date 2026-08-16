@@ -46,15 +46,41 @@ function calculate(){
  let katch=null;if(bf>=5&&bf<=60)katch=370+21.6*(w*(1-bf/100));
  const act=+document.getElementById('activity').value;const bmrBase=katch?((mifflin+katch)/2):mifflin;const tdee=bmrBase*act;
  const goal=document.getElementById('goal').value,pace=document.getElementById('pace').value,tr=+document.getElementById('training').value;
- let factor=1,label='',desc='',adjust='',paceText='',check='';
- if(goal==='cut'){factor={slow:.90,standard:.85,fast:.80}[pace];label='減量';paceText={slow:'週0.25〜0.5%体重減',standard:'週0.5〜0.75%体重減',fast:'週0.75〜1.0%体重減'}[pace];desc='筋量とトレーニングパフォーマンスを守りながら脂肪減少を狙う設定です。';adjust='2週間平均で体重・ウエストがほぼ動かない場合は、まず100〜150 kcal減。逆に体重減少が速すぎる、筋力低下・強い空腹・回復不良が出る場合は100〜150 kcal戻す。';check='体重の週平均・ウエスト・主要種目の記録・睡眠/疲労';}
- else if(goal==='recomp'){factor=.95;label='リコンプ';paceText='体重維持〜緩やかな減少';desc='体重だけで判断せず、ウエスト・見た目・筋力の改善を同時に追う設定です。';adjust='2〜3週間、体重が大きく変わらなくてもウエスト減少や筋力向上があれば継続。両方変化がなければ100 kcal前後調整。';check='ウエスト・写真・主要種目の重量/回数・体重週平均';}
- else if(goal==='gain'){factor={slow:1.05,standard:1.08,fast:1.12}[pace];label='増量';paceText={slow:'週0.1〜0.25%体重増',standard:'週0.25〜0.5%体重増',fast:'週0.5%前後体重増'}[pace];desc='必要以上の脂肪増加を抑えながら、筋力・筋量増加を狙う設定です。';adjust='2週間平均で体重が増えず、トレーニングも伸びない場合は100〜150 kcal追加。ウエスト増加が速い場合は100〜150 kcal減らす。';check='体重週平均・ウエスト・筋力/回数・食欲/消化';}
- else {factor=1;label='維持';paceText='体重を±0.5〜1.0%以内で管理';desc='現在の体重を大きく動かさず、パフォーマンスとコンディションを整える設定です。';adjust='2週間平均で体重が継続的に増減する場合は100 kcal前後調整。体重が安定し、体調とパフォーマンスが良好なら変更不要。';check='体重週平均・睡眠・疲労感・主要種目のパフォーマンス';}
+ let factor=1,label='',desc='',adjust='',paceText='',check='',decision='';
+ if(goal==='cut'){
+   factor={slow:.90,standard:.85,fast:.80}[pace];label='減量';
+   paceText={slow:'週0.25〜0.5%体重減',standard:'週0.5〜0.75%体重減',fast:'週0.75〜1.0%体重減'}[pace];
+   desc='筋量とトレーニングパフォーマンスを守りながら脂肪減少を狙う設定です。';
+   adjust='2週間の週平均で体重・ウエストがともにほぼ動かない → −100〜150 kcal。目標ペースを大きく超えて減る、筋力低下・強い空腹・回復不良が出る → ＋100〜150 kcal。';
+   check='体重の週平均・ウエスト・写真・主要種目の重量/回数・睡眠/疲労';
+   decision='体重またはウエストが目標方向へ進み、筋力・回復が保てている → 継続。体重だけ落ちて筋力・回復が悪化 → 削りすぎを疑う。';
+ }
+ else if(goal==='recomp'){
+   factor=.95;label='リコンプ';paceText='体重維持〜緩やかな減少';
+   desc='体重だけで判断せず、ウエスト・見た目・筋力の改善を同時に追う設定です。';
+   adjust='2〜3週間で体重が横ばいでも、ウエスト減少または筋力向上がある → 変更なし。ウエスト・見た目・筋力がすべて停滞 → まず−100 kcal前後。体重低下が速く筋力も落ちる → ＋100 kcal前後。';
+   check='ウエスト・同条件の写真・主要種目の重量/回数・体重週平均・回復状態';
+   decision='体重横ばい＋ウエスト減少／筋力向上は成功パターン。体重の数字だけで失敗判定しない。';
+ }
+ else if(goal==='gain'){
+   factor={slow:1.05,standard:1.08,fast:1.12}[pace];label='増量';
+   paceText={slow:'週0.1〜0.25%体重増',standard:'週0.25〜0.5%体重増',fast:'週0.5%前後体重増'}[pace];
+   desc='必要以上の脂肪増加を抑えながら、筋力・筋量増加を狙う設定です。';
+   adjust='2〜3週間の週平均で体重が増えず、主要種目も伸びない → ＋100〜150 kcal。体重・ウエストが目標ペースを超えて増える → −100〜150 kcal。';
+   check='体重週平均・ウエスト・主要種目の重量/回数・食欲/消化・回復';
+   decision='体重が緩やかに増え、筋力・回数も伸びている → 継続。ウエストだけ急増してパフォーマンスが伸びない → 余剰が大きすぎる可能性。';
+ }
+ else {
+   factor=1;label='維持';paceText='体重を概ね±0.5〜1.0%以内で管理';
+   desc='現在の体重を大きく動かさず、パフォーマンスとコンディションを整える設定です。';
+   adjust='2週間の週平均で体重が継続的に増える → −100 kcal前後。継続的に減る → ＋100 kcal前後。体重が安定し、体調・筋力が良好 → 変更なし。';
+   check='体重週平均・睡眠・疲労感・空腹感・主要種目のパフォーマンス';
+   decision='体重が許容範囲で安定し、体調・回復・トレーニングが良好 → そのまま維持。';
+ }
  const target=rnd10(tdee*factor);const proteinPerKg=(goal==='cut'||goal==='recomp')?(tr>=2?2.0:1.8):(tr>=2?1.8:1.6);const protein=Math.round(w*proteinPerKg);const fatPerKg=goal==='cut'?.8:.9;const fat=Math.round(w*fatPerKg);const carbs=Math.max(0,Math.round((target-protein*4-fat*9)/4));
  document.getElementById('bmr').textContent=Math.round(bmrBase);document.getElementById('tdee').textContent=rnd10(tdee);document.getElementById('target').textContent=target;document.getElementById('p').textContent=protein;document.getElementById('f').textContent=fat;document.getElementById('c').textContent=carbs;document.getElementById('goalLabel').textContent=label;document.getElementById('rangeText').textContent='目安ペース：'+paceText;
  document.getElementById('bmrCompare').textContent=katch?`Mifflin-St Jeor式：約${Math.round(mifflin)} kcal ／ 除脂肪体重ベース：約${Math.round(katch)} kcal。体脂肪率入力時は両者の中間値を開始目安に使用しています。`:'体脂肪率未入力のため、Mifflin-St Jeor式を使用しています。';
- document.getElementById('plan').innerHTML=`<div class="planitem"><strong>① まず2週間固定</strong><span class="note">毎日の数値ではなく、週平均で判定。</span></div><div class="planitem"><strong>② 見る指標</strong><span class="note">${check}</span></div><div class="planitem"><strong>③ 2週間後の調整</strong><span class="note">${adjust}</span></div><div class="planitem"><strong>④ 判断基準</strong><span class="note good">目的に沿った変化が出ていて、体調・回復・トレーニングが保てていれば継続。</span></div>`;
+ document.getElementById('plan').innerHTML=`<div class="planitem"><strong>① まず2週間固定</strong><span class="note">毎日の数値ではなく、週平均で判定。</span></div><div class="planitem"><strong>② 見る指標</strong><span class="note">${check}</span></div><div class="planitem"><strong>③ 2週間後の調整</strong><span class="note">${adjust}</span></div><div class="planitem"><strong>④ 判断基準</strong><span class="note good">${decision}</span></div>`;
  document.getElementById('explain').textContent=desc+' 数値は固定解ではなく、実測データから微調整するためのスタート地点です。';
  document.getElementById('result').style.display='block';document.getElementById('result').scrollIntoView({behavior:'smooth'});
 }
